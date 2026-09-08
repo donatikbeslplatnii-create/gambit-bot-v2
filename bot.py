@@ -10,7 +10,7 @@ import asyncio
 import io
 from aiohttp import web
 
-API_TOKEN = "8777168852:AAF608vzJDhNZ46xfOtKAd8jnA2uHIEyeh4"
+API_TOKEN = "8870829356:AAF97ZMgKuhg7f7bsf1XI4HQDxAd0ILj5Io"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
@@ -237,11 +237,11 @@ async def about(callback: types.CallbackQuery):
 
 Your personal gaming companion. I help you discover games based on your mood, provide random picks, and keep you updated with gaming news.
 
-✅ 100+ games in database
+✅ 35+ games in database
 ✅ AI-generated covers
 ✅ Updated daily
 ✅ 100% free
-✅ New categories: Co-op, RPG, Horror
+✅ 7 categories: Fast, Explore, Think, Chill, Co-op, RPG, Horror
 
 Built with ❤️ for gamers"""
     
