@@ -117,17 +117,16 @@ def game_actions():
 
 @dp.message(Command("start"))
 async def start(message: types.Message):
-    await message.answer_photo(
-        photo="https://img.icons8.com/fluency/512/video-game.png",
-        caption="**🎮 Gambit Bot**\n\nChoose what you're in the mood for 👇",
+    await message.answer(
+        text="**🎮 Gambit Bot**\n\nChoose what you're in the mood for 👇",
         reply_markup=main_menu(),
         parse_mode="Markdown"
     )
 
 @dp.callback_query(F.data == "menu")
 async def menu(callback: types.CallbackQuery):
-    await callback.message.edit_caption(
-        caption="**🎮 Main Menu**\nChoose your adventure:",
+    await callback.message.edit_text(
+        text="**🎮 Main Menu**\nChoose your adventure:",
         reply_markup=main_menu(),
         parse_mode="Markdown"
     )
@@ -135,8 +134,8 @@ async def menu(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == "find")
 async def find_game(callback: types.CallbackQuery):
-    await callback.message.edit_caption(
-        caption="**🎵 What kind of game are you looking for?**\n\nForget genres for a second. Pick the kind of session you want right now:",
+    await callback.message.edit_text(
+        text="**🎵 What kind of game are you looking for?**\n\nForget genres for a second. Pick the kind of session you want right now:",
         reply_markup=mood_menu(),
         parse_mode="Markdown"
     )
@@ -166,8 +165,8 @@ Want another roll? 👇"""
             parse_mode="Markdown"
         )
     else:
-        await callback.message.edit_caption(
-            caption=caption,
+        await callback.message.edit_text(
+            text=caption,
             reply_markup=game_actions(),
             parse_mode="Markdown"
         )
@@ -203,8 +202,8 @@ Want another? Choose below 👇"""
             parse_mode="Markdown"
         )
     else:
-        await callback.message.edit_caption(
-            caption=caption,
+        await callback.message.edit_text(
+            text=caption,
             reply_markup=game_actions(),
             parse_mode="Markdown"
         )
@@ -222,8 +221,8 @@ async def gaming_updates(callback: types.CallbackQuery):
 
 Stay tuned for more! 🎮"""
     
-    await callback.message.edit_caption(
-        caption=updates_text,
+    await callback.message.edit_text(
+        text=updates_text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔙 Main Menu", callback_data="menu")]
         ]),
@@ -245,8 +244,8 @@ Your personal gaming companion. I help you discover games based on your mood, pr
 
 Built with ❤️ for gamers"""
     
-    await callback.message.edit_caption(
-        caption=about_text,
+    await callback.message.edit_text(
+        text=about_text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔙 Main Menu", callback_data="menu")]
         ]),
@@ -266,8 +265,8 @@ async def trending(callback: types.CallbackQuery):
 
 Check them out!"""
     
-    await callback.message.edit_caption(
-        caption=trending_text,
+    await callback.message.edit_text(
+        text=trending_text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔙 Main Menu", callback_data="menu")]
         ]),
@@ -288,8 +287,8 @@ async def help_command(callback: types.CallbackQuery):
 All games come with AI-generated covers!
 Enjoy! 🎮"""
     
-    await callback.message.edit_caption(
-        caption=help_text,
+    await callback.message.edit_text(
+        text=help_text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔙 Main Menu", callback_data="menu")]
         ]),
