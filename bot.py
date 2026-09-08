@@ -6,13 +6,13 @@ import hashlib
 import json
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import F
 import asyncio
 import io
-import os
+from aiohttp import web
 
 API_TOKEN = "8870829356:AAF213sRQFgdwqVlBCsuqGTlYbvrqizihMY"
 bot = Bot(token=API_TOKEN)
@@ -60,20 +60,6 @@ def get_user_games(user_id):
         return json.loads(result[0])
     return []
 
-def remove_game_from_db(user_id, game_name):
-    conn = sqlite3.connect('gambit_users.db')
-    c = conn.cursor()
-    c.execute("SELECT saved_games FROM users WHERE user_id=?", (user_id,))
-    result = c.fetchone()
-    
-    if result and result[0]:
-        games = json.loads(result[0])
-        games = [g for g in games if g['name'] != game_name]
-        c.execute("UPDATE users SET saved_games=? WHERE user_id=?", (json.dumps(games), user_id))
-        conn.commit()
-    
-    conn.close()
-
 # ============================================
 # ИГРЫ
 # ============================================
@@ -86,9 +72,7 @@ GAMES = {
         {"name": "Hotline Miami", "desc": "Fast-paced top-down shooter with brutal combat.", "best": "action", "vibe": "neon noir"},
         {"name": "ULTRAKILL", "desc": "Ultra-fast retro FPS with style mechanics.", "best": "speed", "vibe": "chaotic"},
         {"name": "Titanfall 2", "desc": "Fast-paced shooter with wall-running and giant mechs.", "best": "movement", "vibe": "sci-fi action"},
-        {"name": "Metal Gear Rising: Revengeance", "desc": "Over-the-top cyber ninja action with metal soundtrack.", "best": "style", "vibe": "cyber samurai"},
-        {"name": "Risk of Rain 2", "desc": "Fast-paced roguelike with insane power scaling.", "best": "action", "vibe": "chaotic"},
-        {"name": "Warframe", "desc": "Space ninjas with fast combat and infinite content.", "best": "speed", "vibe": "sci-fi"}
+        {"name": "Metal Gear Rising: Revengeance", "desc": "Over-the-top cyber ninja action with metal soundtrack.", "best": "style", "vibe": "cyber samurai"}
     ],
     "explore": [
         {"name": "Outer Wilds", "desc": "A tiny spaceship, a solar system to explore and very little explanation.", "best": "curiosity", "vibe": "exploration + mystery"},
@@ -98,8 +82,7 @@ GAMES = {
         {"name": "Red Dead Redemption 2", "desc": "Massive open world in the Wild West.", "best": "immersion", "vibe": "western"},
         {"name": "Elden Ring", "desc": "A challenging open-world RPG from the makers of Dark Souls.", "best": "challenge", "vibe": "dark fantasy"},
         {"name": "Skyrim", "desc": "The legendary open-world RPG that defined a generation.", "best": "freedom", "vibe": "epic fantasy"},
-        {"name": "Horizon Zero Dawn", "desc": "Open-world adventure with robot dinosaurs and rich lore.", "best": "exploration", "vibe": "post-apocalyptic"},
-        {"name": "Hollow Knight", "desc": "Metroidvania with tight combat and a hauntingly beautiful world.", "best": "exploration", "vibe": "dark souls 2D"}
+        {"name": "Horizon Zero Dawn", "desc": "Open-world adventure with robot dinosaurs and rich lore.", "best": "exploration", "vibe": "post-apocalyptic"}
     ],
     "think": [
         {"name": "Civilization VI", "desc": "One more turn can become an entire evening.", "best": "strategy", "vibe": "empire building"},
@@ -109,9 +92,7 @@ GAMES = {
         {"name": "Stellaris", "desc": "Grand strategy in space with deep diplomacy and warfare.", "best": "strategy", "vibe": "space empire"},
         {"name": "Baba Is You", "desc": "A puzzle game where you change the rules by pushing words.", "best": "creativity", "vibe": "mind-bending"},
         {"name": "Frostpunk", "desc": "Survival strategy in a frozen post-apocalyptic world.", "best": "management", "vibe": "dark survival"},
-        {"name": "Kerbal Space Program", "desc": "Build your own rockets and explore the solar system.", "best": "engineering", "vibe": "space exploration"},
-        {"name": "Oxygen Not Included", "desc": "Complex colony sim with physics and survival.", "best": "management", "vibe": "sci-fi"},
-        {"name": "RimWorld", "desc": "Story generator colony sim with deep systems.", "best": "story", "vibe": "survival"}
+        {"name": "Kerbal Space Program", "desc": "Build your own rockets and explore the solar system.", "best": "engineering", "vibe": "space exploration"}
     ],
     "chill": [
         {"name": "Stardew Valley", "desc": "Farm, fish, mine and build relationships.", "best": "relaxation", "vibe": "cozy"},
@@ -121,8 +102,7 @@ GAMES = {
         {"name": "Spiritfarer", "desc": "A cozy management game about caring for spirits.", "best": "heartwarming", "vibe": "emotional"},
         {"name": "A Short Hike", "desc": "A relaxing adventure on a mountain island.", "best": "chill", "vibe": "wholesome"},
         {"name": "Coffee Talk", "desc": "A visual novel about serving coffee and listening to stories.", "best": "story", "vibe": "cozy"},
-        {"name": "Lake", "desc": "A relaxed adventure about delivering mail in a small town.", "best": "peaceful", "vibe": "slice of life"},
-        {"name": "Celeste", "desc": "A punishingly precise platformer with a beautiful story.", "best": "perseverance", "vibe": "emotional"}
+        {"name": "Lake", "desc": "A relaxed adventure about delivering mail in a small town.", "best": "peaceful", "vibe": "slice of life"}
     ],
     "coop": [
         {"name": "Deep Rock Galactic", "desc": "Mining. Aliens. Dwarves. Four-player co-op.", "best": "friends", "vibe": "chaotic co-op"},
@@ -132,8 +112,7 @@ GAMES = {
         {"name": "Phasmophobia", "desc": "Four-player co-op horror game about ghost hunting.", "best": "horror", "vibe": "terrifying co-op"},
         {"name": "Payday 2", "desc": "Co-op heist action. Plan, execute, escape.", "best": "teamwork", "vibe": "criminal"},
         {"name": "Sea of Thieves", "desc": "Pirate co-op adventure on the high seas.", "best": "friends", "vibe": "pirate"},
-        {"name": "Left 4 Dead 2", "desc": "Classic co-op zombie shooter with intense action.", "best": "teamwork", "vibe": "zombie survival"},
-        {"name": "Grounded", "desc": "Co-op survival as tiny kids in a backyard.", "best": "friends", "vibe": "adventure"}
+        {"name": "Left 4 Dead 2", "desc": "Classic co-op zombie shooter with intense action.", "best": "teamwork", "vibe": "zombie survival"}
     ],
     "rpg": [
         {"name": "The Witcher 3", "desc": "A massive open-world RPG with deep storytelling.", "best": "story", "vibe": "dark fantasy"},
@@ -143,8 +122,7 @@ GAMES = {
         {"name": "Baldur's Gate 3", "desc": "Deep RPG with D&D mechanics and amazing choices.", "best": "choice", "vibe": "epic fantasy"},
         {"name": "Disco Elysium", "desc": "A masterpiece RPG where you play as a detective with amnesia.", "best": "writing", "vibe": "surreal"},
         {"name": "Divinity: Original Sin 2", "desc": "Turn-based tactical RPG with incredible freedom.", "best": "tactics", "vibe": "fantasy"},
-        {"name": "Mass Effect Legendary Edition", "desc": "The iconic sci-fi RPG trilogy with unforgettable characters.", "best": "story", "vibe": "space opera"},
-        {"name": "Dragon Age: Inquisition", "desc": "Epic fantasy RPG with deep lore and choices.", "best": "story", "vibe": "fantasy"}
+        {"name": "Mass Effect Legendary Edition", "desc": "The iconic sci-fi RPG trilogy with unforgettable characters.", "best": "story", "vibe": "space opera"}
     ],
     "horror": [
         {"name": "Resident Evil Village", "desc": "Survival horror with first-person perspective and creepy atmosphere.", "best": "fear", "vibe": "survival horror"},
@@ -154,24 +132,20 @@ GAMES = {
         {"name": "Amnesia: Rebirth", "desc": "First-person horror with intense atmosphere and dread.", "best": "tension", "vibe": "psychological terror"},
         {"name": "Outlast", "desc": "First-person survival horror with no weapons.", "best": "fear", "vibe": "run or die"},
         {"name": "Alien Isolation", "desc": "Survival horror on a spaceship with a deadly alien.", "best": "stealth", "vibe": "sci-fi horror"},
-        {"name": "Fatal Frame: Mask of the Lunar Eclipse", "desc": "Japanese horror with a camera as your weapon.", "best": "atmosphere", "vibe": "J-horror"},
-        {"name": "The Evil Within 2", "desc": "Psychological horror with open-world elements.", "best": "fear", "vibe": "survival"}
+        {"name": "Fatal Frame: Mask of the Lunar Eclipse", "desc": "Japanese horror with a camera as your weapon.", "best": "atmosphere", "vibe": "J-horror"}
     ],
     "cyberpunk": [
         {"name": "Cyberpunk 2077", "desc": "Open-world RPG in a dystopian future. Live as a mercenary in Night City.", "best": "immersion", "vibe": "neon noir"},
         {"name": "Deus Ex: Human Revolution", "desc": "Cyberpunk RPG with stealth, combat, and deep choices.", "best": "choice", "vibe": "cyber noir"},
         {"name": "System Shock 2", "desc": "A classic cyberpunk horror FPS with deep RPG elements.", "best": "atmosphere", "vibe": "sci-fi horror"},
         {"name": "Shadowrun: Hong Kong", "desc": "Turn-based RPG in a cyberpunk world with magic and technology.", "best": "story", "vibe": "cyberpunk fantasy"},
-        {"name": "Observer", "desc": "A cyberpunk horror game where you play as a detective with neural implants.", "best": "atmosphere", "vibe": "dark cyberpunk"},
-        {"name": "Ghostrunner", "desc": "One-hit-kill cyberpunk parkour action.", "best": "reflexes", "vibe": "cyberpunk"},
-        {"name": "RUINER", "desc": "Cyberpunk top-down shooter with fast combat.", "best": "action", "vibe": "brutal"}
+        {"name": "Observer", "desc": "A cyberpunk horror game where you play as a detective with neural implants.", "best": "atmosphere", "vibe": "dark cyberpunk"}
     ],
     "medieval": [
         {"name": "Kingdom Come: Deliverance", "desc": "Realistic medieval RPG without fantasy elements.", "best": "realism", "vibe": "historical"},
         {"name": "Mount & Blade II: Bannerlord", "desc": "Medieval sandbox with massive battles and kingdom management.", "best": "freedom", "vibe": "epic warfare"},
         {"name": "Crusader Kings 3", "desc": "Grand strategy RPG about dynasty management in the Middle Ages.", "best": "strategy", "vibe": "medieval politics"},
-        {"name": "For Honor", "desc": "Medieval PvP combat with knights, vikings, and samurai.", "best": "combat", "vibe": "brutal"},
-        {"name": "The Witcher 3", "desc": "Dark fantasy RPG with deep storytelling.", "best": "story", "vibe": "dark fantasy"}
+        {"name": "For Honor", "desc": "Medieval PvP combat with knights, vikings, and samurai.", "best": "combat", "vibe": "brutal"}
     ],
     "masterpieces": [
         {"name": "The Witcher 3", "desc": "A massive open-world RPG with deep storytelling.", "best": "story", "vibe": "dark fantasy"},
@@ -245,7 +219,7 @@ def game_actions(game_name):
     return kb.as_markup()
 
 # ============================================
-# БОТ
+# ОБРАБОТЧИКИ БОТА (С КАРТИНКАМИ)
 # ============================================
 @dp.message(Command("start"))
 async def start(message: types.Message):
@@ -281,6 +255,7 @@ async def surprise_me(callback: types.CallbackQuery):
         reply_markup=None
     )
     await asyncio.sleep(0.5)
+    
     game = random.choice(ALL_GAMES)
     image_data = await generate_game_image(game["name"])
     
@@ -384,7 +359,6 @@ async def cabinet(callback: types.CallbackQuery):
         await callback.answer("❌ You have no saved games yet!", show_alert=True)
         return
     
-    # Ссылка на сайт
     site_url = "https://gambit-cabinet.onrender.com"
     
     text = "**👑 YOUR GAME CABINET**\n\n"
@@ -488,11 +462,13 @@ async def help_command(callback: types.CallbackQuery):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔙 Main Menu", callback_data="menu")]
         ]),
-        parse_mode="Markdown",
-        disable_web_page_preview=False
+        parse_mode="Markdown"
     )
     await callback.answer()
 
+# ============================================
+# ЗАПУСК
+# ============================================
 async def main():
     init_db()
     await dp.start_polling(bot)
