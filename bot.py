@@ -8,6 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import F
 import asyncio
 import io
+from aiohttp import web
 
 API_TOKEN = "8923876419:AAFoG0XQZSCgJrjggbdz5Z_azSDyuzNWj40"
 bot = Bot(token=API_TOKEN)
@@ -216,8 +217,24 @@ Built with ❤️ for gamers"""
     )
     await callback.answer()
 
+async def health(request):
+    return web.Response(text="OK")
+
 async def main():
-    await dp.start_polling(bot)
+    # Запускаем бота
+    asyncio.create_task(dp.start_polling(bot))
+    
+    # Запускаем веб-сервер для Render
+    app = web.Application()
+    app.router.add_get('/', health)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    await site.start()
+    
+    # Держим запущенным
+    while True:
+        await asyncio.sleep(3600)
 
 if __name__ == "__main__":
     asyncio.run(main())
