@@ -10,7 +10,7 @@ import asyncio
 import io
 from aiohttp import web
 
-API_TOKEN = "8638866985:AAGE-2CFG-dhkaSBD2-1XfGPPMzNWIuekEM"
+API_TOKEN = "8638866985:AAGoQEfi0RqZnwZ-hxag4IrJ2lolKp6THe8"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
