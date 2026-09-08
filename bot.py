@@ -14,7 +14,6 @@ API_TOKEN = "8638866985:AAGE-2CFG-dhkaSBD2-1XfGPPMzNWIuekEM"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# БАЗА ИГР
 GAMES = {
     "fast": [
         {"name": "DOOM Eternal", "desc": "Relentless movement and almost no downtime.", "best": "adrenaline", "vibe": "fast-paced"},
@@ -221,18 +220,13 @@ async def health(request):
     return web.Response(text="OK")
 
 async def main():
-    # Запускаем бота
     asyncio.create_task(dp.start_polling(bot))
-    
-    # Запускаем веб-сервер для Render
     app = web.Application()
     app.router.add_get('/', health)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 8080)
     await site.start()
-    
-    # Держим запущенным
     while True:
         await asyncio.sleep(3600)
 
