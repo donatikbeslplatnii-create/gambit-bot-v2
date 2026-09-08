@@ -9,7 +9,7 @@ from aiogram import F
 import asyncio
 import io
 
-API_TOKEN = "8720853997:AAG0vI9JFSM2_610JyV-JdpORCAvegXyoew"
+API_TOKEN = "8720853997:AAHQ3HK0biTBu4wcxpCjS7dYTfdVskcuYWg"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
