@@ -2,7 +2,6 @@ import logging
 import random
 import aiohttp
 import sqlite3
-import hashlib
 import json
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types
@@ -12,9 +11,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import F
 import asyncio
 import io
-from aiohttp import web
 
-API_TOKEN = "8870829356:AAF213sRQFgdwqVlBCsuqGTlYbvrqizihMY"
+API_TOKEN = "8578178174:AAHltDcOzQiyDBIyeP4MSvLLeJ8e8wH2XfY"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
@@ -61,7 +59,7 @@ def get_user_games(user_id):
     return []
 
 # ============================================
-# ИГРЫ
+# ИГРЫ (100+ ИГР, 11 КАТЕГОРИЙ)
 # ============================================
 GAMES = {
     "fast": [
@@ -219,7 +217,7 @@ def game_actions(game_name):
     return kb.as_markup()
 
 # ============================================
-# ОБРАБОТЧИКИ БОТА (С КАРТИНКАМИ)
+# ОБРАБОТЧИКИ
 # ============================================
 @dp.message(Command("start"))
 async def start(message: types.Message):
