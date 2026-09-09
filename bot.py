@@ -9,8 +9,6 @@ import asyncio
 import logging
 
 logging.basicConfig(level=logging.INFO)
-
-# ===== НОВЫЙ ТОКЕН =====
 API_TOKEN = "8578178174:AAGT2dTOjdnw7RS3KqFFyUg8ncRR4f0F1aY"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -167,23 +165,31 @@ async def save(call):
 
 @dp.callback_query(F.data == "cabinet")
 async def cabinet(call):
-    games = get_games(str(call.from_user.id))
+    user_id = str(call.from_user.id)
+    username = call.from_user.username or "Unknown"
+    games = get_games(user_id)
+    
     if not games:
-        await call.answer("No games saved!", show_alert=True)
+        await call.answer("❌ No saved games yet!\nSave a game with 💾 Save first!", show_alert=True)
         return
+    
     text = "👑 **Your Cabinet**\n\n"
     for i, g in enumerate(games, 1):
-        text += f"{i}. {g['name']}\n"
-    text += f"\n🔗 View your cabinet: https://gambit-cabinet.onrender.com?user_id={call.from_user.id}&username={call.from_user.username or 'Unknown'}"
+        text += f"{i}. **{g['name']}**\n"
+    
+    site_url = f"https://gambit-cabinet.onrender.com?user_id={user_id}&username={username}"
+    text += f"\n🔗 [Open Website]({site_url})"
+    
     await call.message.delete()
     await call.message.answer_photo(
         photo="https://i.ibb.co/4Rz4hXcz/IMG-20260909-114219-254.jpg",
         caption=text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🌐 Open Website", url=f"https://gambit-cabinet.onrender.com?user_id={call.from_user.id}&username={call.from_user.username or 'Unknown'}")],
+            [InlineKeyboardButton(text="🌐 Open Website", url=site_url)],
             [InlineKeyboardButton(text="🔙 Menu", callback_data="menu")]
         ]),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        disable_web_page_preview=True
     )
     await call.answer()
 
