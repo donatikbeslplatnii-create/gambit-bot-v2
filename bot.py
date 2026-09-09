@@ -9,7 +9,9 @@ import asyncio
 import logging
 
 logging.basicConfig(level=logging.INFO)
-API_TOKEN = "8578178174:AAHltDcOzQiyDBIyeP4MSvLLeJ8e8wH2XfY"
+
+# ===== НОВЫЙ ТОКЕН =====
+API_TOKEN = "8578178174:AAGT2dTOjdnw7RS3KqFFyUg8ncRR4f0F1aY"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
@@ -80,15 +82,6 @@ ALL_GAMES = [
     {"name": "Mass Effect Legendary", "desc": "The iconic sci-fi RPG trilogy.", "best": "story", "vibe": "space opera", "category": "rpg", "img": "https://i.ibb.co/DPX6r3Yj/IMG-20260909-114124-682.jpg"},
     {"name": "Dragon Age Inquisition", "desc": "Epic fantasy RPG with deep lore.", "best": "story", "vibe": "fantasy", "category": "rpg", "img": "https://i.ibb.co/DPX6r3Yj/IMG-20260909-114124-682.jpg"},
 ]
-
-# ===== КАРТИНКИ ДЛЯ МЕНЮ =====
-MENU_IMAGES = {
-    "fast": "https://i.ibb.co/4Rz4hXcz/IMG-20260909-114219-254.jpg",
-    "explore": "https://i.ibb.co/tMvWJx5b/IMG-20260909-114211-960.jpg",
-    "think": "https://i.ibb.co/9mNRLv68/IMG-20260909-114152-339.jpg",
-    "chill": "https://i.ibb.co/XrpYfNVH/IMG-20260909-114141-322.jpg",
-    "rpg": "https://i.ibb.co/tMvWJx5b/IMG-20260909-114211-960.jpg",
-}
 
 # ===== КНОПКИ =====
 def main_menu():
