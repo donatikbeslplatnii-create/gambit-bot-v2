@@ -9,11 +9,13 @@ import asyncio
 import logging
 
 logging.basicConfig(level=logging.INFO)
+
+# ===== НОВЫЙ ТОКЕН (ПРАВИЛЬНЫЙ) =====
 API_TOKEN = "8578178174:AAHltDcOzQiyDBIyeP4MSvLLeJ8e8wH2XfY"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# БАЗА ДАННЫХ
+# ===== БАЗА ДАННЫХ =====
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -44,16 +46,16 @@ def get_games(user_id):
     conn.close()
     return json.loads(row[0]) if row else []
 
-# ===== ИГРЫ С ВНЕШНИМИ КАРТИНКАМИ =====
+# ===== ИГРЫ С КАРТИНКАМИ =====
 GAMES = [
-    {"name": "DOOM Eternal", "desc": "Relentless movement", "best": "action", "vibe": "fast", "img": "https://i.ibb.co/sFpXhX0/doom.jpg"},
-    {"name": "Hades", "desc": "Sharp combat", "best": "skill", "vibe": "myth", "img": "https://i.ibb.co/hLbKq8J/hades.jpg"},
-    {"name": "Outer Wilds", "desc": "Space exploration", "best": "mystery", "vibe": "space", "img": "https://i.ibb.co/rvZ2J4P/outer.jpg"},
-    {"name": "Stardew Valley", "desc": "Farming RPG", "best": "relax", "vibe": "cozy", "img": "https://i.ibb.co/Fh9sVgJ/stardew.jpg"},
-    {"name": "Elden Ring", "desc": "Dark fantasy RPG", "best": "challenge", "vibe": "dark", "img": "https://i.ibb.co/G9pWqGn/elden.jpg"},
-    {"name": "Subnautica", "desc": "Underwater survival", "best": "explore", "vibe": "deep", "img": "https://i.ibb.co/YkRZxJZ/subnautica.jpg"},
-    {"name": "The Witcher 3", "desc": "Open-world RPG", "best": "story", "vibe": "fantasy", "img": "https://i.ibb.co/7Xx8zVK/witcher.jpg"},
-    {"name": "Cyberpunk 2077", "desc": "Sci-fi RPG", "best": "immersion", "vibe": "neon", "img": "https://i.ibb.co/DtX8hCv/cyberpunk.jpg"},
+    {"name": "DOOM Eternal", "desc": "Relentless movement and almost no downtime.", "best": "adrenaline", "vibe": "fast-paced", "img": "https://i.ibb.co/sFpXhX0/doom.jpg"},
+    {"name": "Hades", "desc": "Quick runs, sharp combat and constant progression.", "best": "skill", "vibe": "mythological", "img": "https://i.ibb.co/hLbKq8J/hades.jpg"},
+    {"name": "Outer Wilds", "desc": "A tiny spaceship, a solar system to explore.", "best": "curiosity", "vibe": "exploration + mystery", "img": "https://i.ibb.co/rvZ2J4P/outer.jpg"},
+    {"name": "Stardew Valley", "desc": "Farm, fish, mine and build relationships.", "best": "relaxation", "vibe": "cozy", "img": "https://i.ibb.co/Fh9sVgJ/stardew.jpg"},
+    {"name": "Elden Ring", "desc": "A challenging open-world RPG from the makers of Dark Souls.", "best": "challenge", "vibe": "dark fantasy", "img": "https://i.ibb.co/G9pWqGn/elden.jpg"},
+    {"name": "Subnautica", "desc": "Underwater survival on an alien planet.", "best": "discovery", "vibe": "deep sea", "img": "https://i.ibb.co/YkRZxJZ/subnautica.jpg"},
+    {"name": "The Witcher 3", "desc": "A massive open-world RPG with deep storytelling.", "best": "story", "vibe": "dark fantasy", "img": "https://i.ibb.co/7Xx8zVK/witcher.jpg"},
+    {"name": "Cyberpunk 2077", "desc": "Open-world RPG in a dystopian future.", "best": "immersion", "vibe": "neon noir", "img": "https://i.ibb.co/DtX8hCv/cyberpunk.jpg"},
 ]
 
 # ===== КНОПКИ =====
@@ -77,7 +79,7 @@ async def start(msg):
 async def surprise(call):
     try:
         game = random.choice(GAMES)
-        text = f"**{game['name']}**\n{game['desc']}\n\n🎯 {game['best']}\n✨ {game['vibe']}"
+        text = f"**🎲 {game['name']}**\n\n{game['desc']}\n\n**Best for:** {game['best']}\n**Vibe:** {game['vibe']}"
         
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="💾 Save", callback_data=f"save_{game['name']}")],
@@ -155,7 +157,7 @@ async def back(call):
 
 async def main():
     init_db()
-    logging.info("Бот запущен!")
+    logging.info("🚀 Бот запущен!")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
